@@ -1,0 +1,17 @@
+services:
+  tripit-mcp:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - TRIPIT_USERNAME=${TRIPIT_USERNAME}
+      - TRIPIT_PASSWORD=${TRIPIT_PASSWORD}
+      - TRIPIT_CLIENT_ID=${TRIPIT_CLIENT_ID}
+      - TRIPIT_CLIENT_SECRET=${TRIPIT_CLIENT_SECRET}
+    restart: unless-stopped
+    command: ["/app/.venv/bin/python", "-m", "tripit_mcp", "--mode", "http", "--host", "0.0.0.0", "--port", "8000"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
