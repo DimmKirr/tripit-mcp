@@ -1,0 +1,29 @@
+name: API Health
+
+on:
+  schedule:
+    - cron: "0 8 * * *"  # daily at 8am UTC
+  workflow_dispatch:
+
+jobs:
+  schema-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - run: uv sync
+      - run: pip install xmlschema
+      - run: uv run python scripts/validate_schema.py --schema-only
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+      - run: uv sync
+      - run: uv run python scripts/smoke_test.py
+        env:
+          TRIPIT_USERNAME: ${{ secrets.TRIPIT_USERNAME }}
+          TRIPIT_PASSWORD: ${{ secrets.TRIPIT_PASSWORD }}
+          TRIPIT_CLIENT_ID: ${{ secrets.TRIPIT_CLIENT_ID }}
+          TRIPIT_CLIENT_SECRET: ${{ secrets.TRIPIT_CLIENT_SECRET }}
